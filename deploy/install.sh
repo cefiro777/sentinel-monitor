@@ -13,6 +13,10 @@
 #   SENTINEL_FILES_FROM=/path/deploy — взять файлы развёртывания из локальной папки, без скачивания
 set -euo pipefail
 
+# Весь скрипт — в фигурных скобках: bash прочитает его целиком до запуска. Иначе при «curl | bash»
+# команды, читающие stdin (docker compose exec), съедят остаток скрипта, и он молча оборвётся.
+{
+
 REPO="cefiro777/sentinel-monitor"
 DIR="${SENTINEL_DIR:-/opt/sentinel}"
 VERSION="${SENTINEL_VERSION:-latest}"
@@ -122,7 +126,7 @@ compose up -d --remove-orphans
 
 echo -n "Жду запуска сервера "
 for _ in $(seq 1 90); do
-    if compose exec -T server sh -c 'exit 0' >/dev/null 2>&1 && \
+    if compose exec -T server sh -c 'exit 0' </dev/null >/dev/null 2>&1 && \
        compose logs server 2>/dev/null | grep -q "Application started"; then break; fi
     echo -n "."; sleep 2
 done
@@ -150,3 +154,5 @@ fi
 echo
 echo "Бэкапы БД и ключей: $DEPLOY/data/backups (ежесуточно, 14 копий) — копируйте их за пределы сервера."
 echo "Обновление: повторите эту же команду установки."
+exit 0
+}
