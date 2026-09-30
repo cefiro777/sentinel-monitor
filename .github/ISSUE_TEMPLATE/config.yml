@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Сообщить об уязвимости
+    url: https://github.com/cefiro777/sentinel-monitor/security/advisories/new
+    about: Приватно — не публикуйте уязвимости в открытых задачах.
+  - name: Вопросы и обсуждения
+    url: https://github.com/cefiro777/sentinel-monitor/discussions
+    about: Как настроить, как лучше сделать, идеи — в обсуждениях.

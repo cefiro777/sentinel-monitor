@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Description>Домен: тенанты, хосты, проверки, инциденты, правила</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Sentinel.Contracts\Sentinel.Contracts.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" />
+    <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" />
+  </ItemGroup>
+
+</Project>

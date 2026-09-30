@@ -1,0 +1,35 @@
+# .NET
+bin/
+obj/
+*.user
+*.suo
+.vs/
+*.swp
+TestResults/
+artifacts/
+
+# Node
+node_modules/
+dist/
+.vite/
+
+# Secrets / local
+*.local.json
+.env
+deploy/.env
+deploy/data/
+
+# OS
+Thumbs.db
+.DS_Store
+
+# Собранный дашборд (см. npm run build:server)
+src/Sentinel.Server/wwwroot/
+artifacts/
+
+# Локальные данные dev-сервера: ключи подписи/шифрования, пакет агента — никогда не коммитить
+src/Sentinel.Server/data/
+data/
+*.tsbuildinfo
+# Загружаемые при сборке установщиков редистрибутивы (.NET 4.8, PostgreSQL, VC++)
+installers/redist/

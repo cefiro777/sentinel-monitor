@@ -1,0 +1,36 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>sentinel-server</UserSecretsId>
+    <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Sentinel.Contracts\Sentinel.Contracts.csproj" />
+    <ProjectReference Include="..\Sentinel.Server.Core\Sentinel.Server.Core.csproj" />
+    <ProjectReference Include="..\Sentinel.Server.Data\Sentinel.Server.Data.csproj" />
+    <ProjectReference Include="..\Sentinel.Notifications\Sentinel.Notifications.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Seed\service-presets.json" LogicalName="service-presets.json" />
+    <EmbeddedResource Include="Seed\event-hints.json" LogicalName="event-hints.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Serilog.AspNetCore" />
+    <PackageReference Include="Serilog.Sinks.File" />
+    <PackageReference Include="Microsoft.Extensions.Hosting.WindowsServices" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" />
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="BouncyCastle.Cryptography" />
+    <PackageReference Include="Konscious.Security.Cryptography.Argon2" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,21 @@
+name: Предложение
+description: Новая проверка, интеграция или улучшение
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Какую задачу нужно решить
+      description: Опишите ситуацию из практики — что приходится делать вручную или что сейчас не видно.
+    validations:
+      required: true
+  - type: textarea
+    id: solution
+    attributes:
+      label: Как это могло бы работать
+      description: Какая проверка, настройка или кнопка помогла бы.
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Как решаете сейчас
+      description: Скрипты, другие системы мониторинга, ручные проверки.

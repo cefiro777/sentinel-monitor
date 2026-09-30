@@ -1,0 +1,4 @@
+{$SENTINEL_DOMAIN} {
+    encode gzip
+    reverse_proxy server:8080
+}

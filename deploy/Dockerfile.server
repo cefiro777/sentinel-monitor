@@ -1,0 +1,34 @@
+# Сборка дашборда
+FROM node:20-alpine AS web
+WORKDIR /web
+COPY src/Sentinel.Web/package*.json ./
+RUN npm ci
+COPY src/Sentinel.Web/ ./
+RUN npm run build
+
+# Сборка сервера
+FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
+WORKDIR /src
+COPY global.json Directory.Build.props Directory.Packages.props ./
+COPY src/Sentinel.Contracts/Sentinel.Contracts.csproj src/Sentinel.Contracts/
+COPY src/Sentinel.Server.Core/Sentinel.Server.Core.csproj src/Sentinel.Server.Core/
+COPY src/Sentinel.Server.Data/Sentinel.Server.Data.csproj src/Sentinel.Server.Data/
+COPY src/Sentinel.Notifications/Sentinel.Notifications.csproj src/Sentinel.Notifications/
+COPY src/Sentinel.Server/Sentinel.Server.csproj src/Sentinel.Server/
+RUN dotnet restore src/Sentinel.Server/Sentinel.Server.csproj
+COPY src/ src/
+# Версия из тега релиза; пусто — из Directory.Build.props
+ARG VERSION=
+RUN dotnet publish src/Sentinel.Server/Sentinel.Server.csproj -c Release -o /app --no-restore ${VERSION:+-p:Version=$VERSION}
+
+# Рантайм
+FROM mcr.microsoft.com/dotnet/aspnet:10.0
+# Дополнительные корневые CA (Russian Trusted Root CA — нужен для API Max и других сервисов с российскими сертификатами)
+COPY deploy/certs/ /usr/local/share/ca-certificates/sentinel/
+RUN update-ca-certificates
+WORKDIR /app
+COPY --from=build /app ./
+COPY --from=web /web/dist ./wwwroot
+VOLUME /data
+EXPOSE 8080
+ENTRYPOINT ["dotnet", "Sentinel.Server.dll"]

@@ -1,0 +1,9 @@
+# Сборка образа сервера из исходников вместо готового из ghcr.io (разработка, свои правки).
+# docker compose -f docker-compose.yml -f docker-compose.build.yml up -d --build
+#   (+ -f docker-compose.nginx.yml, если сервер за существующим nginx)
+services:
+  server:
+    image: sentinel/server:local
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile.server

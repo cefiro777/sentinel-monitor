@@ -1,0 +1,49 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net48</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <AssemblyName>SentinelAgent</AssemblyName>
+    <RootNamespace>Sentinel.Agent</RootNamespace>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Sentinel.Contracts\Sentinel.Contracts.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="System.ServiceProcess" />
+    <Reference Include="System.Management" />
+    <Reference Include="System.Security" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.IO.Compression" />
+    <Reference Include="System.IO.Compression.FileSystem" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Hosting" />
+    <PackageReference Include="Microsoft.Extensions.Hosting.WindowsServices" />
+    <PackageReference Include="Microsoft.Extensions.Http" />
+    <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" />
+    <PackageReference Include="Microsoft.Data.Sqlite" />
+    <PackageReference Include="BouncyCastle.Cryptography" />
+    <PackageReference Include="Serilog.Extensions.Hosting" />
+    <PackageReference Include="Serilog.Sinks.File" />
+    <PackageReference Include="Serilog.Sinks.Console" />
+  </ItemGroup>
+
+  <!-- SQLitePCLRaw 2.1.12 ссылается на runtimes\win-arm, которого в пакете нет — убираем несуществующие файлы из копирования. -->
+  <Target Name="RemoveMissingNativeContent" BeforeTargets="AssignTargetPaths">
+    <ItemGroup>
+      <Content Remove="@(Content)" Condition="!Exists('%(Content.FullPath)')" />
+    </ItemGroup>
+  </Target>
+
+</Project>

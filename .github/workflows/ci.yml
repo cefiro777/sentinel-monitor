@@ -1,0 +1,55 @@
+# Проверка на каждый push и pull request: сборка сервера, агента, дашборда и тесты.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  server:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+      - name: Сборка и тесты
+        run: |
+          dotnet build src/Sentinel.Server/Sentinel.Server.csproj -c Release
+          dotnet test tests/Sentinel.Contracts.Tests -c Release
+          dotnet test tests/Sentinel.Server.Tests -c Release
+
+  web:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: src/Sentinel.Web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: src/Sentinel.Web/package-lock.json
+      - run: npm ci
+      - run: npm run build
+
+  agent:
+    # Агент — .NET Framework 4.8, собирается только на Windows.
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+      - run: dotnet build src/Sentinel.Agent/Sentinel.Agent.csproj -c Release
+
+  install-script:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: bash -n deploy/install.sh && shellcheck -S warning deploy/install.sh

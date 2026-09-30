@@ -1,0 +1,11 @@
+**/bin/
+**/obj/
+**/node_modules/
+**/dist/
+**/wwwroot/
+artifacts/
+deploy/data/
+deploy/.env
+.git/
+.claude/
+*.user

@@ -1,0 +1,12 @@
+# Режим без домена: HTTPS на IP-адресе с сертификатом внутреннего CA Caddy.
+# Агенты доверяют серверу по pin корневого сертификата (сервер отдаёт его в команде установки).
+# Браузер будет предупреждать о сертификате — можно импортировать data/caddy/pki/authorities/local/root.crt в доверенные.
+{
+    default_sni {$SENTINEL_DOMAIN}   # клиенты по IP не передают SNI
+}
+
+{$SENTINEL_DOMAIN} {
+    tls internal
+    encode gzip
+    reverse_proxy server:8080
+}

@@ -1,0 +1,13 @@
+﻿<Project>
+  <PropertyGroup>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <LangVersion>latest</LangVersion>
+    <Deterministic>true</Deterministic>
+    <Company>Sentinel</Company>
+    <Product>Sentinel Monitoring</Product>
+    <Version>0.4.0</Version>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+  </PropertyGroup>
+</Project>

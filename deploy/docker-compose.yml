@@ -1,0 +1,68 @@
+# Продакшн-стек: PostgreSQL + сервер Sentinel + Caddy (автоматический TLS от Let's Encrypt).
+# Установка одной командой: deploy/install.sh. Вручную: cp env.example .env, отредактируйте .env, docker compose up -d
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: sentinel
+      POSTGRES_USER: sentinel
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?задайте POSTGRES_PASSWORD в .env}
+    volumes:
+      - ./data/postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U sentinel -d sentinel"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  server:
+    # Готовый образ из GitHub Releases. Собрать из исходников: добавьте -f docker-compose.build.yml
+    image: ${SENTINEL_IMAGE:-ghcr.io/cefiro777/sentinel-monitor-server}:${SENTINEL_VERSION:-latest}
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      ASPNETCORE_URLS: http://0.0.0.0:8080
+      ConnectionStrings__Default: Host=postgres;Port=5432;Database=sentinel;Username=sentinel;Password=${POSTGRES_PASSWORD}
+      Sentinel__DataDir: /data
+      Sentinel__PublicUrl: https://${SENTINEL_DOMAIN:?задайте SENTINEL_DOMAIN (домен или IP) в .env}
+      Sentinel__Bootstrap__AdminEmail: ${ADMIN_EMAIL:-admin@local}
+      Sentinel__Bootstrap__AdminPassword: ${ADMIN_PASSWORD:-}
+      Sentinel__TelegramProxy: ${TELEGRAM_PROXY:-}
+    volumes:
+      - ./data/server:/data
+      - ./data/caddy:/caddy:ro   # режим без домена: сервер вычисляет pin корневого CA Caddy для агентов
+    expose:
+      - "8080"
+
+  # Ежесуточный бэкап самого сервера: дамп БД + ключи (data.key, jwt.key, signing.key). Хранится 14 копий в ./data/backups.
+  # Копируйте эту папку наружу (rsync/облако): без signing.key и data.key все агенты придётся переустанавливать.
+  backup:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      PGPASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - ./data/backups:/backups
+      - ./data/server:/serverdata:ro
+    entrypoint: ["/bin/sh", "-c", "while true; do ts=$$(date +%Y%m%d_%H%M); pg_dump -h postgres -U sentinel -d sentinel -Fc -f /backups/sentinel_$$ts.dump && tar czf /backups/keys_$$ts.tgz -C /serverdata keys && echo \"backup $$ts ok\"; ls -1t /backups/sentinel_*.dump 2>/dev/null | tail -n +15 | xargs -r rm -f; ls -1t /backups/keys_*.tgz 2>/dev/null | tail -n +15 | xargs -r rm -f; sleep 86400; done"]
+
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    depends_on:
+      - server
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      SENTINEL_DOMAIN: ${SENTINEL_DOMAIN}
+    volumes:
+      # Caddyfile — домен с Let's Encrypt; Caddyfile.ip — только IP, внутренний CA (задайте CADDYFILE=Caddyfile.ip в .env)
+      - ./${CADDYFILE:-Caddyfile}:/etc/caddy/Caddyfile:ro
+      - ./data/caddy:/data

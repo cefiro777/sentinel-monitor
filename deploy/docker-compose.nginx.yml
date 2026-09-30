@@ -1,0 +1,9 @@
+# Режим «за существующим nginx/Apache»: Caddy не запускается, сервер слушает 127.0.0.1:${SENTINEL_PORT:-8085}.
+# Использование: docker compose -f docker-compose.yml -f docker-compose.nginx.yml up -d --build
+# Пример конфига nginx — deploy/nginx-sentinel.conf.example (нужен TLS: certbot --nginx -d <домен>).
+services:
+  caddy:
+    profiles: ["disabled"]
+  server:
+    ports:
+      - "127.0.0.1:${SENTINEL_PORT:-8085}:8080"

@@ -1,0 +1,60 @@
+name: Ошибка
+description: Что-то работает не так, как ожидалось
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Спасибо, что сообщаете! **Не вставляйте пароли, токены, реальные адреса и имена клиентов** — замените их на условные.
+        Уязвимость безопасности — не сюда, а через [приватный отчёт](../security/advisories/new).
+  - type: dropdown
+    id: component
+    attributes:
+      label: Компонент
+      options:
+        - Сервер / дашборд
+        - Агент
+        - Бэкапы
+        - Видеонаблюдение
+        - Оповещения (Telegram / Max / почта)
+        - Установка (install.sh / установщики Windows)
+        - Другое
+    validations:
+      required: true
+  - type: textarea
+    id: what
+    attributes:
+      label: Что произошло
+      description: Что делали, что ожидали увидеть и что получили вместо этого.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Как воспроизвести
+      placeholder: |
+        1. Открыть …
+        2. Нажать …
+        3. Увидеть ошибку …
+  - type: input
+    id: version
+    attributes:
+      label: Версия
+      description: Версия сервера (релиз) и агента (SentinelAgent.exe version)
+      placeholder: сервер 0.4.0, агент 0.4.0
+    validations:
+      required: true
+  - type: input
+    id: env
+    attributes:
+      label: Окружение
+      description: Как установлен сервер и где стоит агент
+      placeholder: сервер — install.sh на Ubuntu 24.04 (режим domain); агент — Windows Server 2019
+  - type: textarea
+    id: logs
+    attributes:
+      label: Логи
+      description: |
+        Сервер: `docker compose logs server` или `%ProgramData%\Sentinel\Server\logs`.
+        Агент: `%ProgramData%\Sentinel\Agent\logs`, вывод `SentinelAgent.exe diag`.
+      render: text

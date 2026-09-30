@@ -1,0 +1,372 @@
+[
+  {
+    "id": "base",
+    "title": "Базовые службы Windows Server",
+    "description": "Есть на любом Windows Server 2008 R2+. Без них не работают журналирование, RPC/WMI (в т.ч. сам агент), планировщик, сетевой доступ и RDP.",
+    "services": [
+      {
+        "name": "EventLog",
+        "autoRestart": true,
+        "critical": true,
+        "comment": "Журнал событий Windows"
+      },
+      {
+        "name": "RpcSs",
+        "autoRestart": false,
+        "critical": true,
+        "comment": "Удалённый вызов процедур (RPC) — ядро всего"
+      },
+      {
+        "name": "Winmgmt",
+        "autoRestart": true,
+        "critical": true,
+        "comment": "Инструментарий управления Windows (WMI) — нужен агенту и VSS"
+      },
+      {
+        "name": "SamSs",
+        "autoRestart": false,
+        "critical": true,
+        "comment": "Диспетчер учётных записей безопасности"
+      },
+      {
+        "name": "Schedule",
+        "autoRestart": true,
+        "critical": false,
+        "comment": "Планировщик заданий"
+      },
+      {
+        "name": "LanmanServer",
+        "autoRestart": true,
+        "critical": true,
+        "comment": "Сервер — доступ к папкам и принтерам по сети"
+      },
+      {
+        "name": "LanmanWorkstation",
+        "autoRestart": true,
+        "critical": false,
+        "comment": "Рабочая станция — доступ к чужим шарам"
+      },
+      {
+        "name": "Dnscache",
+        "autoRestart": true,
+        "critical": false,
+        "comment": "DNS-клиент"
+      },
+      {
+        "name": "CryptSvc",
+        "autoRestart": true,
+        "critical": false,
+        "comment": "Службы криптографии — обновления, сертификаты"
+      },
+      {
+        "name": "EventSystem",
+        "autoRestart": true,
+        "critical": false,
+        "comment": "Система событий COM+"
+      },
+      {
+        "name": "TermService",
+        "autoRestart": true,
+        "critical": true,
+        "comment": "Службы удалённых рабочих столов — без неё вы не зайдёте по RDP"
+      }
+    ]
+  },
+  {
+    "id": "domain-member",
+    "title": "Сервер в домене",
+    "description": "Для любого сервера, введённого в домен: без Netlogon перестаёт работать доменная аутентификация; W32Time вне домена может быть остановлена штатно, поэтому она здесь.",
+    "services": [
+      {
+        "name": "Netlogon",
+        "autoRestart": true,
+        "critical": true,
+        "comment": "Сетевой вход в систему"
+      },
+      {
+        "name": "W32Time",
+        "autoRestart": true,
+        "critical": false,
+        "comment": "Служба времени Windows — в домене работает всегда; расхождение часов ломает Kerberos и 1С"
+      }
+    ]
+  },
+  {
+    "id": "ad-ds",
+    "title": "Контроллер домена (AD DS)",
+    "description": "Active Directory, Kerberos, DNS и репликация SYSVOL. Если домен ещё на FRS (старые домены с 2008 R2), добавьте вручную NtFrs.",
+    "services": [
+      {
+        "name": "NTDS",
+        "autoRestart": true,
+        "critical": true,
+        "comment": "Доменные службы Active Directory"
+      },
+      {
+        "name": "Kdc",
+        "autoRestart": true,
+        "critical": true,
+        "comment": "Центр распространения ключей Kerberos"
+      },
+      {
+        "name": "Netlogon",
+        "autoRestart": true,
+        "critical": true,
+        "comment": "Сетевой вход в систему"
+      },
+      {
+        "name": "DNS",
+        "autoRestart": true,
+        "critical": true,
+        "comment": "DNS-сервер — без него домен «не находится»"
+      },
+      {
+        "name": "DFSR",
+        "autoRestart": true,
+        "critical": true,
+        "comment": "Репликация DFS — SYSVOL, групповые политики"
+      },
+      {
+        "name": "Dfs",
+        "autoRestart": true,
+        "critical": false,
+        "comment": "Пространство имён DFS"
+      },
+      {
+        "name": "W32Time",
+        "autoRestart": true,
+        "critical": true,
+        "comment": "Служба времени — на PDC критична"
+      },
+      {
+        "name": "ADWS",
+        "autoRestart": true,
+        "critical": false,
+        "comment": "Веб-службы Active Directory — оснастки и PowerShell AD"
+      },
+      {
+        "name": "IsmServ",
+        "autoRestart": true,
+        "critical": false,
+        "comment": "Межсайтовый обмен сообщениями"
+      }
+    ]
+  },
+  {
+    "id": "dhcp",
+    "title": "DHCP-сервер",
+    "description": "Роль DHCP: если служба стоит, у пользователей через сутки-двое пропадёт сеть.",
+    "services": [
+      {
+        "name": "DHCPServer",
+        "autoRestart": true,
+        "critical": true,
+        "comment": "DHCP-сервер"
+      }
+    ]
+  },
+  {
+    "id": "dns",
+    "title": "DNS-сервер (отдельный)",
+    "description": "Для DNS-сервера не на контроллере домена.",
+    "services": [
+      {
+        "name": "DNS",
+        "autoRestart": true,
+        "critical": true,
+        "comment": "DNS-сервер"
+      }
+    ]
+  },
+  {
+    "id": "dfs",
+    "title": "DFS (пространства имён и репликация)",
+    "description": "Файловые серверы с DFS.",
+    "services": [
+      {
+        "name": "Dfs",
+        "autoRestart": true,
+        "critical": true,
+        "comment": "Пространство имён DFS"
+      },
+      {
+        "name": "DFSR",
+        "autoRestart": true,
+        "critical": true,
+        "comment": "Репликация DFS"
+      }
+    ]
+  },
+  {
+    "id": "print",
+    "title": "Сервер печати",
+    "description": "Диспетчер печати — самая часто «зависающая» служба на серверах печати; автозапуск обычно решает проблему.",
+    "services": [
+      {
+        "name": "Spooler",
+        "autoRestart": true,
+        "critical": true,
+        "comment": "Диспетчер печати"
+      }
+    ]
+  },
+  {
+    "id": "rds",
+    "title": "Терминальный сервер (RDS Session Host)",
+    "description": "Сервер, на котором работают пользователи по RDP (в т.ч. 1С в терминале).",
+    "services": [
+      {
+        "name": "TermService",
+        "autoRestart": true,
+        "critical": true,
+        "comment": "Службы удалённых рабочих столов"
+      },
+      {
+        "name": "SessionEnv",
+        "autoRestart": true,
+        "critical": true,
+        "comment": "Настройка удалённых рабочих столов"
+      },
+      {
+        "name": "UmRdpService",
+        "autoRestart": true,
+        "critical": false,
+        "comment": "Перенаправление портов (принтеры, диски, буфер обмена)"
+      }
+    ]
+  },
+  {
+    "id": "rds-licensing",
+    "title": "RDS: сервер лицензирования",
+    "description": "Если стоит — через льготный период пользователи перестанут подключаться.",
+    "services": [
+      {
+        "name": "TermServLicensing",
+        "autoRestart": true,
+        "critical": true,
+        "comment": "Лицензирование удалённых рабочих столов"
+      }
+    ]
+  },
+  {
+    "id": "mssql",
+    "title": "MS SQL Server (экземпляр по умолчанию)",
+    "description": "MSSQLSERVER + агент (задания обслуживания и бэкапов) + VSS-модуль. В Express агент отсутствует — удалите SQLSERVERAGENT из списка.",
+    "services": [
+      {
+        "name": "MSSQLSERVER",
+        "autoRestart": true,
+        "critical": true,
+        "comment": "SQL Server (MSSQLSERVER)"
+      },
+      {
+        "name": "SQLSERVERAGENT",
+        "autoRestart": true,
+        "critical": true,
+        "comment": "Агент SQL Server — планы обслуживания и задания"
+      },
+      {
+        "name": "SQLWriter",
+        "autoRestart": true,
+        "critical": false,
+        "comment": "Модуль записи SQL Server VSS — нужен для бэкапов снимками"
+      }
+    ]
+  },
+  {
+    "id": "mssql-express",
+    "title": "MS SQL Server (именованный экземпляр SQLEXPRESS)",
+    "description": "Для другого имени экземпляра замените SQLEXPRESS в имени службы (MSSQL$ИМЯ). SQLBrowser нужен клиентам, чтобы найти именованный экземпляр.",
+    "services": [
+      {
+        "name": "MSSQL$SQLEXPRESS",
+        "autoRestart": true,
+        "critical": true,
+        "comment": "SQL Server (SQLEXPRESS)"
+      },
+      {
+        "name": "SQLBrowser",
+        "autoRestart": true,
+        "critical": false,
+        "comment": "Обозреватель SQL Server"
+      },
+      {
+        "name": "SQLWriter",
+        "autoRestart": true,
+        "critical": false,
+        "comment": "Модуль записи SQL Server VSS"
+      }
+    ]
+  },
+  {
+    "id": "1c",
+    "title": "Сервер 1С:Предприятие 8.3",
+    "description": "Агент сервера 1С. Число в скобках — порт агента (1540 по умолчанию); при нестандартном порте или нескольких версиях сверьте имя службы в services.msc.",
+    "services": [
+      {
+        "name": "1C:Enterprise 8.3 Server Agent (1540)",
+        "autoRestart": true,
+        "critical": true,
+        "comment": "Агент сервера 1С:Предприятия 8.3"
+      }
+    ]
+  },
+  {
+    "id": "hasp",
+    "title": "Ключи защиты 1С (HASP / Sentinel LDK)",
+    "description": "Сервер аппаратных ключей 1С: если служба стоит — пользователи не получают лицензии.",
+    "services": [
+      {
+        "name": "hasplms",
+        "autoRestart": true,
+        "critical": true,
+        "comment": "Sentinel LDK License Manager"
+      }
+    ]
+  },
+  {
+    "id": "postgres",
+    "title": "PostgreSQL (сборка для 1С)",
+    "description": "Имя службы зависит от сборки и версии: postgresql-x64-15, postgresql-x64-16, postgrespro-1c-15… Замените на своё из services.msc.",
+    "services": [
+      {
+        "name": "postgresql-x64-15",
+        "autoRestart": true,
+        "critical": true,
+        "comment": "PostgreSQL Server"
+      }
+    ]
+  },
+  {
+    "id": "hyperv",
+    "title": "Hyper-V",
+    "description": "Хост виртуализации. На Server 2016+ можно добавить ещё vmcompute.",
+    "services": [
+      {
+        "name": "vmms",
+        "autoRestart": true,
+        "critical": true,
+        "comment": "Управление виртуальными машинами Hyper-V"
+      }
+    ]
+  },
+  {
+    "id": "iis",
+    "title": "IIS (веб-сервер)",
+    "description": "Публикация 1С через веб, сайты, веб-сервисы.",
+    "services": [
+      {
+        "name": "W3SVC",
+        "autoRestart": true,
+        "critical": true,
+        "comment": "Служба веб-публикаций"
+      },
+      {
+        "name": "WAS",
+        "autoRestart": true,
+        "critical": true,
+        "comment": "Служба активации процессов Windows"
+      }
+    ]
+  }
+]
